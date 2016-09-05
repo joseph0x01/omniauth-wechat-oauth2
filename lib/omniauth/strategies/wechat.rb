@@ -24,7 +24,11 @@ module OmniAuth
       # additional calls (if the user id is returned with the token
       # or as a URI parameter). This may not be possible with all
       # providers.
-      uid { raw_info['openid'] }
+      uid do
+        @uid ||= begin
+          access_token['openid']
+        end
+      end
 
       info do
         {
@@ -65,7 +69,7 @@ module OmniAuth
           'code' => request.params['code'],
           'grant_type' => 'authorization_code'
           }.merge(token_params.to_hash(symbolize_keys: true))
-        client.get_token(params, deep_symbolize(options.auth_token_params))
+        client.get_token(params, {:mode => :query})
       end
     end
   end
